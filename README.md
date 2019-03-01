@@ -1,3 +1,8 @@
+
+## Introduction
+
+This project is a fork of the original Paysim project. It implements extended features for fraud detection and credit scoring.
+
 ## Project Leader
 
 Dr. Edgar Lopez-Rojas
