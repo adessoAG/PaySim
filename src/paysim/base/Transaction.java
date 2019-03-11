@@ -2,6 +2,7 @@ package paysim.base;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 
 import paysim.output.Output;
 
@@ -13,6 +14,8 @@ public class Transaction implements Serializable {
     //private final String purpose; //Verwendungszweck
 
     private final String nameOrig;
+    private final String place;
+    private final String dateTime;
     private final double oldBalanceOrig, newBalanceOrig;
 
     private final String nameDest;
@@ -30,6 +33,8 @@ public class Transaction implements Serializable {
         this.action = action;
         this.amount = amount;
         this.nameOrig = nameOrig;
+        this.place = setPlace();
+        this.dateTime = setDateTime();
         this.oldBalanceOrig = oldBalanceOrig;
         this.newBalanceOrig = newBalanceOrig;
         this.nameDest = nameDest;
@@ -106,6 +111,18 @@ public class Transaction implements Serializable {
         return newBalanceDest;
     }
 
+    public String setPlace(){
+        String[] staedte = {"Paris", "New York", "Berlin", "Hamburg"};
+        int random_int = new Random().nextInt(staedte.length);
+        return staedte[random_int];
+    }
+
+    public String setDateTime(){
+        int hour = this.step % 23;
+        int min = new Random().nextInt(60);
+        return String.format("%02d:%02d", hour, min);
+    }
+
     @Override
     public String toString(){
         ArrayList<String> properties = new ArrayList<>();
@@ -114,6 +131,8 @@ public class Transaction implements Serializable {
         properties.add(action);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, amount));
         properties.add(nameOrig);
+        properties.add(place);
+        properties.add(dateTime);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, oldBalanceOrig));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, newBalanceOrig));
         properties.add(nameDest);

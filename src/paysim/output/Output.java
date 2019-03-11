@@ -45,7 +45,7 @@ public class Output {
 
     public enum payment_method
     {
-        Automat, Filiale, Geschäft
+        Automat, Filiale, Geschaeft
     }
 
     public enum type_of_payment{
@@ -61,7 +61,7 @@ public class Output {
     }
 
     public static void incrementalWriteRawLog(int step, ArrayList<Transaction> transactions) {
-        String rawLogHeader = "step,action,amount,nameOrig,oldBalanceOrig,newBalanceOrig,nameDest,oldBalanceDest,newBalanceDest,isFraud,isFlaggedFraud,isUnauthorizedOverdraft";
+        String rawLogHeader = "step,action,amount,nameOrig,place,datetime,oldBalanceOrig,newBalanceOrig,nameDest,oldBalanceDest,newBalanceDest,isFraud,isFlaggedFraud,isUnauthorizedOverdraft";
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filenameRawLog, true));
             if (step == 0) {
