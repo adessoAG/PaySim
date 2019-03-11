@@ -21,6 +21,8 @@ import paysim.base.StepActionProfile;
 
 import paysim.output.Output;
 
+import paysim.utils.CSVReader;
+
 public class PaySim extends SimState {
     public static final double PAYSIM_VERSION = 1.0;
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "5"};
@@ -33,6 +35,8 @@ public class PaySim extends SimState {
     private ArrayList<Merchant> merchants = new ArrayList<>();
     private ArrayList<Fraudster> fraudsters = new ArrayList<>();
     private ArrayList<Bank> banks = new ArrayList<>();
+
+    private ArrayList<String[]> cities;
 
     private ArrayList<Transaction> transactions = new ArrayList<>();
     private int currentStep;
@@ -75,6 +79,8 @@ public class PaySim extends SimState {
 
         Output.initOutputFilenames(simulationName);
         Output.writeParameters(seed());
+
+        cities = CSVReader.read("paramFiles/Staedte.csv");
     }
 
     private void runSimulation() {
@@ -94,7 +100,7 @@ public class PaySim extends SimState {
 
 
 
-            if(Output.getRandomBoolean()== true){
+            if(Output.getRandomBoolean()){
                 System.out.println("Step :"+ currentStep+ " " + Output.writeDate_time() + " " +  " ," + " "+Output.writeVirtual_time() + " Online-Banking, IP Address :" +" "+  Output.write_ip() +
                         ", "+ "Aktion:" +" "+ Output.writeAction1());
 
@@ -279,6 +285,11 @@ public class PaySim extends SimState {
             nameDest = clientDest.getName();
         }
         return clientDest;
+    }
+
+    public String pickRandomCity(){
+        int random_int = random.nextInt(this.cities.size());
+        return cities.get(random_int)[0];
     }
 
     public int getTotalTransactions() {

@@ -27,13 +27,13 @@ public class Transaction implements Serializable {
     private boolean isUnauthorizedOverdraft = false;
 
 
-    public Transaction(int step, String action, double amount, String nameOrig, double oldBalanceOrig,
+    public Transaction(int step, String action, double amount, String nameOrig, String place, double oldBalanceOrig,
                        double newBalanceOrig, String nameDest, double oldBalanceDest, double newBalanceDest) {
         this.step = step;
         this.action = action;
         this.amount = amount;
         this.nameOrig = nameOrig;
-        this.place = setPlace();
+        this.place = place;
         this.dateTime = setDateTime();
         this.oldBalanceOrig = oldBalanceOrig;
         this.newBalanceOrig = newBalanceOrig;
@@ -109,12 +109,6 @@ public class Transaction implements Serializable {
 
     public double getNewBalanceDest() {
         return newBalanceDest;
-    }
-
-    public String setPlace(){
-        String[] staedte = {"Paris", "New York", "Berlin", "Hamburg"};
-        int random_int = new Random().nextInt(staedte.length);
-        return staedte[random_int];
     }
 
     public String setDateTime(){
