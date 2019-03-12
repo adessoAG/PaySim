@@ -25,7 +25,7 @@ import paysim.utils.CSVReader;
 
 public class PaySim extends SimState {
     public static final double PAYSIM_VERSION = 1.0;
-    private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "5"};
+    private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
 
     public final String simulationName;
     private int totalTransactionsMade = 0;
@@ -174,7 +174,7 @@ public class PaySim extends SimState {
                     pickRandomBank(),
                     pickNextClientProfile(),
                     BalancesClients.pickNextBalance(random),
-                    random,
+                    pickRandomCity(), random,
                     Parameters.stepsProfiles.getTotalTargetCount(),
                     generate_client_nr());
             clients.add(c);

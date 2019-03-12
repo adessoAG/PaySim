@@ -6,12 +6,12 @@ import paysim.base.Transaction;
 public class Mule extends Client {
     private static final String MULE_IDENTIFIER = "C";
 
-    public Mule(String name, Bank bank) {
-        super(MULE_IDENTIFIER + name, bank);
+    public Mule(String name, Bank bank, String place) {
+        super(MULE_IDENTIFIER + name, bank, place);
         this.overdraftLimit = 0;
     }
 
-    void fraudulentCashOut(PaySim paysim, int step, double amount, String place) {
+    void fraudulentCashOut(PaySim paysim, int step, double amount, int timeInMinutes) {
         String action = "CASH_OUT";
 
         Merchant merchantTo = paysim.pickRandomMerchant();
@@ -25,7 +25,7 @@ public class Mule extends Client {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
-        Transaction t = new Transaction(step, action, amount, nameOrig, place, oldBalanceOrig,
+        Transaction t = new Transaction(step, action, amount, nameOrig, getPlace(), timeInMinutes, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
         t.setFraud(this.isFraud());
         paysim.getTransactions().add(t);
