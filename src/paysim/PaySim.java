@@ -37,6 +37,7 @@ public class PaySim extends SimState {
     private ArrayList<Bank> banks = new ArrayList<>();
 
     private ArrayList<String[]> cities;
+    private HashMap<String, double[]> distanceMatrix;
 
     private ArrayList<Transaction> transactions = new ArrayList<>();
     private int currentStep;
@@ -80,7 +81,9 @@ public class PaySim extends SimState {
         Output.initOutputFilenames(simulationName);
         Output.writeParameters(seed());
 
-        cities = CSVReader.read("paramFiles/Staedte.csv");
+        cities = CSVReader.read("paramFiles/citiesWithCoordinates.csv");
+        distanceMatrix = generateDistanceMatrix();
+
     }
 
     private void runSimulation() {
@@ -266,6 +269,20 @@ public class PaySim extends SimState {
 
         System.out.println(c);
 
+    }
+
+    private HashMap<String, double[]> generateDistanceMatrix(){
+        HashMap<String, double[]> distanceMatrix = new HashMap<>();
+        int numberOfCities = cities.size();
+        for(int i=0; i < numberOfCities; i++){
+            double[] distances = new double[numberOfCities];
+            for(int j=0; j < numberOfCities; j++){
+                distances[j] = Math.sqrt( Math.pow(Double.parseDouble(cities.get(i)[1]) - Double.parseDouble(cities.get(j)[1]) ,2) +
+                                          Math.pow(Double.parseDouble(cities.get(i)[2]) - Double.parseDouble(cities.get(j)[2]) ,2));
+            }
+            distanceMatrix.put(cities.get(i)[0], distances);
+        }
+        return distanceMatrix;
     }
 
     public Merchant pickRandomMerchant() {

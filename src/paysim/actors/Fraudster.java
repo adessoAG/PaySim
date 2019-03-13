@@ -45,7 +45,7 @@ public class Fraudster extends SuperActor implements Steppable {
                     }
 
                     profit += muleClient.getBalance();
-                    muleClient.fraudulentCashOut(paysim, step, muleClient.getBalance(), timeInMinutes);
+                    muleClient.fraudulentCashOut(paysim, step, muleClient.getBalance(), timeInMinutes + new Random().nextInt(30));
                     nbVictims++;
                     paysim.getClients().add(muleClient);
                     if (transferFailed)
