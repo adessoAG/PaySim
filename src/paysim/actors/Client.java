@@ -10,6 +10,7 @@ import paysim.parameters.BalancesClients;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.distribution.Binomial;
+import org.apache.commons.math3.distribution.ParetoDistribution;
 
 import paysim.PaySim;
 import paysim.base.ClientActionProfile;
@@ -29,6 +30,7 @@ public class Client extends SuperActor implements Steppable {
             PAYMENT = "PAYMENT", TRANSFER = "TRANSFER", DEPOSIT = "DEPOSIT";
     private final Bank bank;
     private String place;
+    private ParetoDistribution movement;
     private ClientProfile clientProfile;
     private double clientWeight;
     private double balanceMax = 0;
@@ -48,6 +50,7 @@ public class Client extends SuperActor implements Steppable {
         super(CLIENT_IDENTIFIER + name);
         this.bank = bank;
         this.place = place;
+        this.movement = new ParetoDistribution(0.0001, (double) 1/20);
         this.clientProfile = new ClientProfile(profile, random);
         this.clientWeight = ((double) clientProfile.getClientTargetCount()) / totalTargetCount;
         this.balance = initBalance;
@@ -58,6 +61,20 @@ public class Client extends SuperActor implements Steppable {
 
     public String getPlace() {
         return place;
+    }
+
+    public int getRandomPlace(double[] distances){
+        double randomDistance = movement.sample();
+        int indexOfCity = 0;
+        double minimum = Math.abs(distances[0] - randomDistance);
+        for(int i=1; i < distances.length; i++){
+            double tmp = Math.abs(distances[i] - randomDistance);
+            if(tmp < minimum){
+                minimum = tmp;
+                indexOfCity = i;
+            }
+        }
+        return indexOfCity;
     }
 
     @Override
@@ -77,7 +94,8 @@ public class Client extends SuperActor implements Steppable {
                 int timeInMinutes = (step % 23)*60 + random.nextInt(60);
                 if(isPreferredTime(random, action, timeInMinutes)) {
                     double amount = pickAmount(random, action, stepAmountProfile);
-                    makeTransaction(paySim, step, action, amount, timeInMinutes);
+                    String randomPlace = paySim.getCiyByIndex(getRandomPlace(paySim.getDistances(place)));
+                    makeTransaction(paySim, step, action, amount, timeInMinutes, randomPlace);
                 }
             }
         }
@@ -140,34 +158,34 @@ public class Client extends SuperActor implements Steppable {
 
 
         //war zuvor private die Methode, aufpassen!
-    public void makeTransaction(PaySim state, int step, String action, double amount, int timeInMinutes) {
+    public void makeTransaction(PaySim state, int step, String action, double amount, int timeInMinutes, String randomPlace) {
         switch (action) {
             case CASH_IN:
-                handleCashIn(state, step, amount, timeInMinutes);
+                handleCashIn(state, step, amount, timeInMinutes, randomPlace);
                 break;
             case CASH_OUT:
-                handleCashOut(state, step, amount, timeInMinutes);
+                handleCashOut(state, step, amount, timeInMinutes, randomPlace);
                 break;
             case DEBIT:
-                handleDebit(state, step, amount, timeInMinutes);
+                handleDebit(state, step, amount, timeInMinutes, randomPlace);
                 break;
             case PAYMENT:
-                handlePayment(state, step, amount, timeInMinutes);
+                handlePayment(state, step, amount, timeInMinutes, randomPlace);
                 break;
             case TRANSFER:
                 Client clientTo = state.pickRandomClient(getName());
                 double reducedAmount = amount;
                 boolean lastTransferFailed = false;
                 while (reducedAmount > Parameters.transferLimit && !lastTransferFailed) {
-                    lastTransferFailed = handleTransfer(state, step, Parameters.transferLimit, clientTo, timeInMinutes);
+                    lastTransferFailed = handleTransfer(state, step, Parameters.transferLimit, clientTo, timeInMinutes, randomPlace);
                     reducedAmount -= Parameters.transferLimit;
                 }
                 if (reducedAmount > 0 && !lastTransferFailed) {
-                    handleTransfer(state, step, reducedAmount, clientTo, timeInMinutes);
+                    handleTransfer(state, step, reducedAmount, clientTo, timeInMinutes, randomPlace);
                 }
                 break;
             case DEPOSIT:
-                handleDeposit(state, step, amount, timeInMinutes);
+                handleDeposit(state, step, amount, timeInMinutes, randomPlace);
                 break;
             default:
                 throw new UnsupportedOperationException("Action not implemented in Client");
@@ -175,7 +193,7 @@ public class Client extends SuperActor implements Steppable {
     }
 
         //war private vorher
-         public void handleCashIn(PaySim paysim, int step, double amount, int timeInMinutes) {
+         public void handleCashIn(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
         Merchant merchantTo = paysim.pickRandomMerchant();
         String nameOrig = this.getName();
         String nameDest = merchantTo.getName();
@@ -187,12 +205,12 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
-        Transaction t = new Transaction(step, CASH_IN, amount, nameOrig, place, timeInMinutes, oldBalanceOrig,
+        Transaction t = new Transaction(step, CASH_IN, amount, nameOrig, randomPlace, timeInMinutes, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest );
         paysim.getTransactions().add(t);
     }
 
-    public void handleCashOut(PaySim paysim, int step, double amount, int timeInMinutes) {
+    public void handleCashOut(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
         Merchant merchantTo = paysim.pickRandomMerchant();
         String nameOrig = this.getName();
         String nameDest = merchantTo.getName();
@@ -205,7 +223,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
-        Transaction t = new Transaction(step, CASH_OUT, amount, nameOrig, place, timeInMinutes, oldBalanceOrig,
+        Transaction t = new Transaction(step, CASH_OUT, amount, nameOrig, randomPlace, timeInMinutes, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
 
         t.setUnauthorizedOverdraft(isUnauthorizedOverdraft);
@@ -213,7 +231,7 @@ public class Client extends SuperActor implements Steppable {
         paysim.getTransactions().add(t);
     }
 
-        private  void handleDebit(PaySim paysim, int step, double amount, int timeInMinutes) {
+        private  void handleDebit(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
         String nameOrig = this.getName();
         String nameDest = this.bank.getName();
         double oldBalanceOrig = this.getBalance();
@@ -231,7 +249,7 @@ public class Client extends SuperActor implements Steppable {
         paysim.getTransactions().add(t);
     }
 
-    private void handlePayment(PaySim paysim, int step, double amount, int timeInMinutes) {
+    private void handlePayment(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
         Merchant merchantTo = paysim.pickRandomMerchant();
 
         String nameOrig = this.getName();
@@ -292,11 +310,7 @@ public class Client extends SuperActor implements Steppable {
         return transferFailed;
     }
 
-    boolean handleTransfer(PaySim paysim, int step, double amount, Client clientTo, int timeInMinutes) {
-        return handleTransfer(paysim, step, amount, clientTo, timeInMinutes, this.place);
-    }
-
-    private void handleDeposit(PaySim paysim, int step, double amount, int timeInMinutes) {
+    private void handleDeposit(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
         String nameOrig = this.getName();
         String nameDest = this.bank.getName();
         double oldBalanceOrig = this.getBalance();
@@ -307,7 +321,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = this.bank.getBalance();
 
-        Transaction t = new Transaction(step, DEPOSIT, amount, nameOrig, place, timeInMinutes, oldBalanceOrig,
+        Transaction t = new Transaction(step, DEPOSIT, amount, nameOrig, randomPlace, timeInMinutes, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
 
         paysim.getTransactions().add(t);

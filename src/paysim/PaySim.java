@@ -325,6 +325,14 @@ public class PaySim extends SimState {
         return clients;
     }
 
+    public double[] getDistances(String place) {
+        return distanceMatrix.get(place);
+    }
+
+    public String getCiyByIndex(int index){
+        return cities.get(index)[0];
+    }
+
     public int getStepTargetCount() {
         return Parameters.stepsProfiles.getTargetCount(currentStep);
     }
