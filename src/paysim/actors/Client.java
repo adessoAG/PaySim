@@ -50,7 +50,7 @@ public class Client extends SuperActor implements Steppable {
         super(CLIENT_IDENTIFIER + name);
         this.bank = bank;
         this.place = place;
-        this.movement = new ParetoDistribution(0.0001, (double) 1/20);
+        this.movement = new ParetoDistribution(0.0001, (double) 1/5);
         this.clientProfile = new ClientProfile(profile, random);
         this.clientWeight = ((double) clientProfile.getClientTargetCount()) / totalTargetCount;
         this.balance = initBalance;
