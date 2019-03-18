@@ -2,7 +2,11 @@ package paysim.base;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 
+
+
 public class ClientActionProfile {
+
+    private static final int MINUTES_PER_DAY = 1440;
     private final String action;
     private final int minCount, maxCount;
     private final double avgAmount, stdAmount;
@@ -39,7 +43,9 @@ public class ClientActionProfile {
     }
 
     public double getProbabilty(int minutes){
-        return timeDistribution.cumulativeProbability(minutes);
+        double aUnionB = timeDistribution.probability(0, minutes);
+        double b = timeDistribution.probability(0, MINUTES_PER_DAY);
+        return timeDistribution.cumulativeProbability(aUnionB / b);
     }
 
 }
