@@ -43,9 +43,9 @@ public class ClientActionProfile {
     }
 
     public double getProbabilty(int minutes){
-        double aUnionB = timeDistribution.probability(0, minutes);
+        double aUnionB = timeDistribution.probability(minutes, minutes+60);
         double b = timeDistribution.probability(0, MINUTES_PER_DAY);
-        return timeDistribution.cumulativeProbability(aUnionB / b);
+        return aUnionB / b;
     }
 
 }

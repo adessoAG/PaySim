@@ -81,7 +81,7 @@ public class PaySim extends SimState {
         Output.initOutputFilenames(simulationName);
         Output.writeParameters(seed());
 
-        cities = CSVReader.read("paramFiles/citiesWithCoordinates.csv");
+        cities = CSVReader.read("paramFiles/citiesFiltered.csv");
         distanceMatrix = generateDistanceMatrix();
 
     }
@@ -273,14 +273,24 @@ public class PaySim extends SimState {
 
     private HashMap<String, double[]> generateDistanceMatrix(){
         HashMap<String, double[]> distanceMatrix = new HashMap<>();
+        double R = 6371;
         int numberOfCities = cities.size();
         for(int i=0; i < numberOfCities; i++){
             double[] distances = new double[numberOfCities];
             for(int j=0; j < numberOfCities; j++){
-                distances[j] = Math.sqrt( Math.pow(Double.parseDouble(cities.get(i)[1]) - Double.parseDouble(cities.get(j)[1]) ,2) +
-                                          Math.pow(Double.parseDouble(cities.get(i)[2]) - Double.parseDouble(cities.get(j)[2]) ,2));
+                double lat_i = Double.parseDouble(cities.get(i)[6]);
+                double lon_i = Double.parseDouble(cities.get(i)[7]);
+                double lat_j = Double.parseDouble(cities.get(j)[6]);
+                double lon_j = Double.parseDouble(cities.get(j)[7]);
+                double phi_1 = Math.toRadians(lat_i);
+                double phi_2 = Math.toRadians(lat_j);
+                double diff_phi = Math.toRadians(lat_j - lat_i);
+                double diff_lambda = Math.toRadians(lon_j - lon_i);
+                double a = Math.pow(Math.sin(diff_phi/2), 2) + Math.cos(phi_1)*Math.cos(phi_2)*Math.pow(Math.sin(diff_lambda/2), 2);
+                double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                distances[j] = R * c;
             }
-            distanceMatrix.put(cities.get(i)[0], distances);
+            distanceMatrix.put(cities.get(i)[3], distances);
         }
         return distanceMatrix;
     }
@@ -306,7 +316,7 @@ public class PaySim extends SimState {
 
     public String pickRandomCity(){
         int random_int = random.nextInt(this.cities.size());
-        return cities.get(random_int)[0];
+        return cities.get(random_int)[3];
     }
 
     public int getTotalTransactions() {
@@ -329,8 +339,8 @@ public class PaySim extends SimState {
         return distanceMatrix.get(place);
     }
 
-    public String getCiyByIndex(int index){
-        return cities.get(index)[0];
+    public String getCityByIndex(int index){
+        return cities.get(index)[3];
     }
 
     public int getStepTargetCount() {

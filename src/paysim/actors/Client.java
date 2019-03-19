@@ -50,7 +50,7 @@ public class Client extends SuperActor implements Steppable {
         super(CLIENT_IDENTIFIER + name);
         this.bank = bank;
         this.place = place;
-        this.movement = new ParetoDistribution(0.0001, (double) 1/5);
+        this.movement = new ParetoDistribution(0.0001, (double) 1);
         this.clientProfile = new ClientProfile(profile, random);
         this.clientWeight = ((double) clientProfile.getClientTargetCount()) / totalTargetCount;
         this.balance = initBalance;
@@ -87,14 +87,13 @@ public class Client extends SuperActor implements Steppable {
             Map<String, Double> stepActionProfile = paySim.getStepProbabilities();
 
             int count = pickCount(random, stepTargetCount);
-
             for (int t = 0; t < count; t++) {
                 String action = pickAction(random, stepActionProfile);
                 StepActionProfile stepAmountProfile = paySim.getStepAction(action);
                 int timeInMinutes = (step % 23)*60 + random.nextInt(60);
-                if(isPreferredTime(random, action, timeInMinutes)) {
+                if(isPreferredTime(random, action, (step % 23)*60)) {
                     double amount = pickAmount(random, action, stepAmountProfile);
-                    String randomPlace = paySim.getCiyByIndex(getRandomPlace(paySim.getDistances(place)));
+                    String randomPlace = paySim.getCityByIndex(getRandomPlace(paySim.getDistances(place)));
                     makeTransaction(paySim, step, action, amount, timeInMinutes, randomPlace);
                 }
             }
