@@ -3,7 +3,6 @@ package paysim.base;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 
-
 public class ClientActionProfile {
 
     private static final int MINUTES_PER_DAY = 1440;

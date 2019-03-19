@@ -35,8 +35,6 @@ public class Client extends SuperActor implements Steppable {
     private double clientWeight;
     private double balanceMax = 0;
     private int countTransferTransactions = 0;
-    //Kundennummer, by default 0
-    private String client_number;
 
 
     Client(String name, Bank bank, String place) {
@@ -46,7 +44,7 @@ public class Client extends SuperActor implements Steppable {
     }
 
     public Client(String name, Bank bank, Map<String, ClientActionProfile> profile, double initBalance,
-                  String place, MersenneTwisterFast random, int totalTargetCount, String client_number) {
+                  String place, MersenneTwisterFast random, int totalTargetCount) {
         super(CLIENT_IDENTIFIER + name);
         this.bank = bank;
         this.place = place;
@@ -55,7 +53,6 @@ public class Client extends SuperActor implements Steppable {
         this.clientWeight = ((double) clientProfile.getClientTargetCount()) / totalTargetCount;
         this.balance = initBalance;
         this.overdraftLimit = pickOverdraftLimit(random);
-        this.client_number = client_number;
     }
 
 
@@ -63,7 +60,7 @@ public class Client extends SuperActor implements Steppable {
         return place;
     }
 
-    public int getRandomPlace(double[] distances){
+    private int getRandomPlace(double[] distances){
         double randomDistance = movement.sample();
         int indexOfCity = 0;
         double minimum = Math.abs(distances[0] - randomDistance);
@@ -156,8 +153,7 @@ public class Client extends SuperActor implements Steppable {
     }
 
 
-        //war zuvor private die Methode, aufpassen!
-    public void makeTransaction(PaySim state, int step, String action, double amount, int timeInMinutes, String randomPlace) {
+    private void makeTransaction(PaySim state, int step, String action, double amount, int timeInMinutes, String randomPlace) {
         switch (action) {
             case CASH_IN:
                 handleCashIn(state, step, amount, timeInMinutes, randomPlace);
@@ -191,8 +187,7 @@ public class Client extends SuperActor implements Steppable {
         }
     }
 
-        //war private vorher
-         public void handleCashIn(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
+    private void handleCashIn(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
         Merchant merchantTo = paysim.pickRandomMerchant();
         String nameOrig = this.getName();
         String nameDest = merchantTo.getName();
@@ -209,7 +204,7 @@ public class Client extends SuperActor implements Steppable {
         paysim.getTransactions().add(t);
     }
 
-    public void handleCashOut(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
+    private void handleCashOut(PaySim paysim, int step, double amount, int timeInMinutes, String randomPlace) {
         Merchant merchantTo = paysim.pickRandomMerchant();
         String nameOrig = this.getName();
         String nameDest = merchantTo.getName();
@@ -241,7 +236,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = this.bank.getBalance();
 
-        Transaction t = new Transaction(step, DEBIT, amount, nameOrig, place, timeInMinutes, oldBalanceOrig,
+        Transaction t = new Transaction(step, DEBIT, amount, nameOrig, randomPlace, timeInMinutes, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
 
         t.setUnauthorizedOverdraft(isUnauthorizedOverdraft);
@@ -264,7 +259,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
-        Transaction t = new Transaction(step, PAYMENT, amount, nameOrig, place, timeInMinutes, oldBalanceOrig,
+        Transaction t = new Transaction(step, PAYMENT, amount, nameOrig, randomPlace, timeInMinutes, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
 
         t.setUnauthorizedOverdraft(isUnauthorizedOverdraft);

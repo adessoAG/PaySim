@@ -2,7 +2,6 @@ package paysim.base;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Random;
 
 import paysim.output.Output;
 
@@ -11,7 +10,6 @@ public class Transaction implements Serializable {
     private final int step;
     private final String action;
     private final double amount;
-    //private final String purpose; //Verwendungszweck
 
     private final String nameOrig;
     private final String place;
@@ -40,8 +38,6 @@ public class Transaction implements Serializable {
         this.nameDest = nameDest;
         this.oldBalanceDest = oldBalanceDest;
         this.newBalanceDest = newBalanceDest;
-        //verwendungszweck
-      //  this.purpose= purpose;
 
     }
 
@@ -61,12 +57,6 @@ public class Transaction implements Serializable {
         this.isUnauthorizedOverdraft = isUnauthorizedOverdraft;
     }
 
-        /*
-    public String getPurpose(){
-        return this.purpose;
-    }
-
-*/
     public boolean isFlaggedFraud() {
         return isFlaggedFraud;
     }

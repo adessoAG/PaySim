@@ -1,6 +1,5 @@
 package paysim;
 
-//import java.rmi.server.UID;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,7 +23,7 @@ import paysim.output.Output;
 import paysim.utils.CSVReader;
 
 public class PaySim extends SimState {
-    public static final double PAYSIM_VERSION = 1.0;
+    private static final double PAYSIM_VERSION = 1.0;
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
 
     public final String simulationName;
@@ -100,33 +99,11 @@ public class PaySim extends SimState {
                 break;
 
             writeOutputStep();
-
-
-
-            if(Output.getRandomBoolean()){
-                System.out.println("Step :"+ currentStep+ " " + Output.writeDate_time() + " " +  " ," + " "+Output.writeVirtual_time() + " Online-Banking, IP Address :" +" "+  Output.write_ip() +
-                        ", "+ "Aktion:" +" "+ Output.writeAction1());
-
-            }else{
-
-                System.out.println("Step :"+ currentStep+ " " + Output.writeDate_time() + " " +  " ," + " "+Output.writeVirtual_time() +" " + "Ort: "+" " + Output.write_location()
-                        +", " +"Zahlungsweg: "+ Output.writeM2() +", "+ "Aktion:" +" "+ Output.writeAction1()+ ", "+ " Zahlungsprodukt:"+ " " +Output.writeM3());
-            }
-
-            //System.out.println("Transaktion :"+ currentStep+ " " + Output.writeDate_time() + " " +  " ," + " "+Output.writeVirtual_time() + " Online-Banking, IP Address :" +" "+  Output.write_ip()+ ", " + "Ort: "+" " + Output.write_location()
-              //    +", "+ "Zahlungsart:" +" "+ Output.writeM1()+ ", "+"Zahlungsweg: "+ Output.writeM2() +", "+ " Zahlungsprodukt:"+ " " +Output.writeM3());
-
-            /*
-            if (currentStep % 100 == 100 - 1) {
-                System.out.println("Step " + currentStep);
-            } else {
-                System.out.print("*");
-            }
-            */
+            System.out.println("Step :"+ currentStep);
         }
+
         System.out.println();
         System.out.println("Finished running " + currentStep + " steps ");
-
 
         finish();
 
@@ -178,8 +155,7 @@ public class PaySim extends SimState {
                     pickNextClientProfile(),
                     BalancesClients.pickNextBalance(random),
                     pickRandomCity(), random,
-                    Parameters.stepsProfiles.getTotalTargetCount(),
-                    generate_client_nr());
+                    Parameters.stepsProfiles.getTotalTargetCount());
             clients.add(c);
         }
 
@@ -205,7 +181,6 @@ public class PaySim extends SimState {
     public void finish() {
         Output.writeFraudsters(fraudsters);
         Output.writeClientsProfiles(countProfileAssignment, (int) (Parameters.nbClients * Parameters.multiplier));
-        Output.writeDate_time();
         Output.writeSummarySimulation(this);
     }
 
@@ -238,37 +213,6 @@ public class PaySim extends SimState {
         for (int i = 0; i < sizeId; i++)
             idBuilder.append(alphabet.charAt(random.nextInt(alphabet.length())));
         return idBuilder.toString();
-    }
-
-
-    public String generate_client_nr(){
-
-        int max=1000;
-        int min=1;
-        int range = max-min;
-
-        int rand = (int)(Math.random() * range) + min;
-
-        return String.valueOf(rand);
-
-        }
-
-    public void generate_vwz(){
-        char[] ch = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-                'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-                'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                'w', 'x', 'y', 'z' };
-
-        char[] c = new char[50];
-        Random random = new Random();
-        for (int i = 0; i < 50; i++) {
-            c[i] = ch[random.nextInt(ch.length)];
-        }
-
-        System.out.println(c);
-
     }
 
     private HashMap<String, double[]> generateDistanceMatrix(){
