@@ -35,12 +35,15 @@ public class Fraudster extends SuperActor implements Steppable {
                 for (int i = 0; i < nbTransactions; i++) {
                     boolean transferFailed;
                     Mule muleClient = new Mule(paysim.generateId(), paysim.pickRandomBank(), fraudCity);
+                    String verwendungszweck = paysim.pickRandomVerwendungszweck();
                     muleClient.setFraud(true);
                     if (balance > Parameters.transferLimit) {
-                        transferFailed = c.handleTransfer(paysim, step, Parameters.transferLimit, muleClient, timeInMinutes, fraudCity);
+                        transferFailed = c.handleTransfer(paysim, step, Parameters.transferLimit, muleClient, timeInMinutes,
+                                fraudCity, verwendungszweck);
                         balance -= Parameters.transferLimit;
                     } else {
-                        transferFailed = c.handleTransfer(paysim, step, balance, muleClient, timeInMinutes, fraudCity);
+                        transferFailed = c.handleTransfer(paysim, step, balance, muleClient, timeInMinutes, fraudCity,
+                                verwendungszweck);
                         balance = 0;
                     }
 

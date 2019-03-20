@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import paysim.base.StandingOrder;
 import sim.engine.SimState;
 
 import paysim.parameters.*;
@@ -25,6 +26,8 @@ import paysim.utils.CSVReader;
 public class PaySim extends SimState {
     private static final double PAYSIM_VERSION = 1.0;
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
+    private static final int MAX_NUMBER_OF_STANDING_ORDERS = 5;
+    private static final ArrayList<String> verwenundungszwecke = new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
 
     public final String simulationName;
     private int totalTransactionsMade = 0;
@@ -160,9 +163,23 @@ public class PaySim extends SimState {
         }
 
         //Schedule clients to act at each step of the simulation
+        //and add StandingOrders for each Client
         for (Client c : clients) {
+            c.setStandingOrders(generateStandingOrders(c.getName()));
             schedule.scheduleRepeating(c);
         }
+    }
+
+    private ArrayList<StandingOrder> generateStandingOrders(String nameOrig) {
+        ArrayList<String> listOfVWZ = verwenundungszwecke;
+        int number = random.nextInt(listOfVWZ.size());
+        int randomVWZ;
+        ArrayList<StandingOrder> standingOrders = new ArrayList<>();
+        for(int i=0; i < number; i++){
+            randomVWZ = random.nextInt(listOfVWZ.size());
+            standingOrders.add(new StandingOrder(pickRandomClient(nameOrig), listOfVWZ.remove(randomVWZ)));
+        }
+        return standingOrders;
     }
 
     private Map<String, ClientActionProfile> pickNextClientProfile() {
@@ -261,6 +278,10 @@ public class PaySim extends SimState {
     public String pickRandomCity(){
         int random_int = random.nextInt(this.cities.size());
         return cities.get(random_int)[3];
+    }
+
+    public String pickRandomVerwendungszweck(){
+        return verwenundungszwecke.get(random.nextInt(verwenundungszwecke.size()));
     }
 
     public int getTotalTransactions() {

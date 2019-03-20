@@ -14,6 +14,7 @@ public class Transaction implements Serializable {
     private final String nameOrig;
     private final String place;
     private final String dateTime;
+    private final String verwendungszweck;
     private final double oldBalanceOrig, newBalanceOrig;
 
     private final String nameDest;
@@ -25,14 +26,16 @@ public class Transaction implements Serializable {
     private boolean isUnauthorizedOverdraft = false;
 
 
-    public Transaction(int step, String action, double amount, String nameOrig, String place, int timeInMinutes, double oldBalanceOrig,
-                       double newBalanceOrig, String nameDest, double oldBalanceDest, double newBalanceDest) {
+    public Transaction(int step, String action, double amount, String nameOrig, String place, int timeInMinutes,
+                       String verwendungszweck, double oldBalanceOrig, double newBalanceOrig, String nameDest,
+                       double oldBalanceDest, double newBalanceDest) {
         this.step = step;
         this.action = action;
         this.amount = amount;
         this.nameOrig = nameOrig;
         this.place = place;
         this.dateTime = setDateTime(timeInMinutes);
+        this.verwendungszweck = verwendungszweck;
         this.oldBalanceOrig = oldBalanceOrig;
         this.newBalanceOrig = newBalanceOrig;
         this.nameDest = nameDest;
@@ -116,6 +119,7 @@ public class Transaction implements Serializable {
         properties.add(nameOrig);
         properties.add(place);
         properties.add(dateTime);
+        properties.add(verwendungszweck);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, oldBalanceOrig));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, newBalanceOrig));
         properties.add(nameDest);

@@ -25,7 +25,9 @@ public class Mule extends Client {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
-        Transaction t = new Transaction(step, action, amount, nameOrig, getPlace(), timeInMinutes, oldBalanceOrig,
+        String verwendungszweck = paysim.pickRandomVerwendungszweck();
+
+        Transaction t = new Transaction(step, action, amount, nameOrig, getPlace(), timeInMinutes, verwendungszweck, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
         t.setFraud(this.isFraud());
         paysim.getTransactions().add(t);
