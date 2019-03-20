@@ -171,7 +171,7 @@ public class PaySim extends SimState {
     }
 
     private ArrayList<StandingOrder> generateStandingOrders(String nameOrig) {
-        ArrayList<String> listOfVWZ = verwenundungszwecke;
+        ArrayList<String> listOfVWZ = new ArrayList<>(verwenundungszwecke);
         int number = random.nextInt(listOfVWZ.size());
         int randomVWZ;
         ArrayList<StandingOrder> standingOrders = new ArrayList<>();
