@@ -38,7 +38,6 @@ public class Transaction implements Serializable {
         this.nameDest = nameDest;
         this.oldBalanceDest = oldBalanceDest;
         this.newBalanceDest = newBalanceDest;
-
     }
 
     public boolean isFailedTransaction(){
@@ -101,7 +100,7 @@ public class Transaction implements Serializable {
         return newBalanceDest;
     }
 
-    public String setDateTime(int timeInMinutes){
+    private String setDateTime(int timeInMinutes){
         int hour = timeInMinutes / 60;
         int min = timeInMinutes % 60;
         return String.format("%02d:%02d", hour, min);
