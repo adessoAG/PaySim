@@ -10,6 +10,7 @@ public class StandingOrder {
      * The attributes nextStep and amount will generate by the class because they do depend on other actors. We want to
      * avoid the same verwendungszweck for every StandingOrder for the same Client. Thus PaySim will pick a
      * appropriate verwendungszeck.
+     * Since its function is data storage aside from getter and setter there are no real methods.
      */
 
     private static final int BOUND_IN_HOUR = 720;
@@ -40,7 +41,7 @@ public class StandingOrder {
     }
 
     public void setNextStep() {
-        nextStep += 30;
+        nextStep += 720;
     }
 
     public String getVerwendungszweck() {
