@@ -1,6 +1,7 @@
 package paysim.actors;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -24,6 +25,8 @@ public class Fraudster extends SuperActor implements Steppable {
         int step = (int) state.schedule.getSteps();
         if (paysim.random.nextDouble() < Parameters.fraudProbability) {
             Client c = paysim.pickRandomClient(getName());
+            String fraudCity = paysim.pickRandomCity();
+            int timeInMinutes = (step % 23)*60 + new Random().nextInt(60);
             c.setFraud(true);
             double balance = c.getBalance();
             // create mule client
@@ -31,18 +34,18 @@ public class Fraudster extends SuperActor implements Steppable {
                 int nbTransactions = (int) Math.ceil(balance / Parameters.transferLimit);
                 for (int i = 0; i < nbTransactions; i++) {
                     boolean transferFailed;
-                    Mule muleClient = new Mule(paysim.generateId(), paysim.pickRandomBank());
+                    Mule muleClient = new Mule(paysim.generateId(), paysim.pickRandomBank(), fraudCity);
                     muleClient.setFraud(true);
                     if (balance > Parameters.transferLimit) {
-                        transferFailed = c.handleTransfer(paysim, step, Parameters.transferLimit, muleClient);
+                        transferFailed = c.handleTransfer(paysim, step, Parameters.transferLimit, muleClient, timeInMinutes, fraudCity);
                         balance -= Parameters.transferLimit;
                     } else {
-                        transferFailed = c.handleTransfer(paysim, step, balance, muleClient);
+                        transferFailed = c.handleTransfer(paysim, step, balance, muleClient, timeInMinutes, fraudCity);
                         balance = 0;
                     }
 
                     profit += muleClient.getBalance();
-                    muleClient.fraudulentCashOut(paysim, step, muleClient.getBalance());
+                    muleClient.fraudulentCashOut(paysim, step, muleClient.getBalance(), timeInMinutes + new Random().nextInt(30));
                     nbVictims++;
                     paysim.getClients().add(muleClient);
                     if (transferFailed)

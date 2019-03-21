@@ -12,7 +12,8 @@ import paysim.utils.CSVReader;
 import paysim.utils.RandomCollection;
 
 public class ClientsProfiles {
-    private static final int COLUMN_ACTION = 0, COLUMN_LOW = 1, COLUMN_HIGH = 2, COLUMN_AVG = 3, COLUMN_STD = 4, COLUMN_FREQ = 5;
+    private static final int COLUMN_ACTION = 0, COLUMN_LOW = 1, COLUMN_HIGH = 2, COLUMN_AVG_AMOUNT = 3, COLUMN_STD_AMOUNT = 4,
+            COLUMN_AVG_TIME = 5, COLUMN_STD_TIME = 6, COLUMN_FREQ = 7;
     private Map<String, RandomCollection<ClientActionProfile>> profilePickerPerAction = new HashMap<>();
 
     public ClientsProfiles(String filename) {
@@ -28,8 +29,10 @@ public class ClientsProfiles {
                 ClientActionProfile clientActionProfile = new ClientActionProfile(profileString[COLUMN_ACTION],
                         Integer.parseInt(profileString[COLUMN_LOW]),
                         Integer.parseInt(profileString[COLUMN_HIGH]),
-                        Double.parseDouble(profileString[COLUMN_AVG]),
-                        Double.parseDouble(profileString[COLUMN_STD]));
+                        Double.parseDouble(profileString[COLUMN_AVG_AMOUNT]),
+                        Double.parseDouble(profileString[COLUMN_STD_AMOUNT]),
+                        Double.parseDouble(profileString[COLUMN_AVG_TIME]),
+                        Double.parseDouble(profileString[COLUMN_STD_TIME]));
                 profilePicker.add(Double.parseDouble(profileString[COLUMN_FREQ]), clientActionProfile);
             }
         }
