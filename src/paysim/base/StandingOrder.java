@@ -40,8 +40,8 @@ public class StandingOrder {
         return amount;
     }
 
-    public void setNextStep() {
-        nextStep += 720;
+    public void setNextStep(int steps) {
+        nextStep += steps;
     }
 
     public String getVerwendungszweck() {

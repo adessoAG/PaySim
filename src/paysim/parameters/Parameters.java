@@ -1,6 +1,10 @@
 package paysim.parameters;
 
 import java.io.FileInputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -9,6 +13,7 @@ import paysim.output.Output;
 public class Parameters {
     private static String seedString;
     public static int nbClients, nbMerchants, nbBanks, nbFraudsters, nbSteps;
+    public static LocalDateTime startDate;
     public static double multiplier, fraudProbability, transferLimit;
     public static String aggregatedTransactions, maxOccurrencesPerClient, initialBalancesDistribution,
             overdraftLimits, clientsProfilesFile, transactionsTypes;
@@ -43,6 +48,13 @@ public class Parameters {
             nbFraudsters = Integer.parseInt(parameters.getProperty("nbFraudsters"));
             nbMerchants = Integer.parseInt(parameters.getProperty("nbMerchants"));
             nbBanks = Integer.parseInt(parameters.getProperty("nbBanks"));
+
+            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                    .appendPattern("dd.MM.yyyy[ HH:mm]")
+                    .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                    .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                    .toFormatter();
+            startDate = LocalDateTime.parse(parameters.getProperty("startDate"), formatter);
 
             fraudProbability = Double.parseDouble(parameters.getProperty("fraudProbability"));
             transferLimit = Double.parseDouble(parameters.getProperty("transferLimit"));
@@ -83,6 +95,7 @@ public class Parameters {
         properties.add("multiplier=" + multiplier);
         properties.add("nbFraudsters=" + nbFraudsters);
         properties.add("nbMerchants=" + nbMerchants);
+        properties.add("startDate=" +  startDate);
         properties.add("fraudProbability=" + fraudProbability);
         properties.add("transferLimit=" + transferLimit);
         properties.add("transactionsTypes=" + transactionsTypes);

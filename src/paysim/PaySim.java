@@ -3,8 +3,11 @@ package paysim;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
+import org.apache.tinkerpop.shaded.jackson.databind.deser.impl.CreatorCandidate;
 import paysim.base.StandingOrder;
 import sim.engine.SimState;
 
@@ -26,7 +29,6 @@ import paysim.utils.CSVReader;
 public class PaySim extends SimState {
     private static final double PAYSIM_VERSION = 1.0;
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
-    private static final int MAX_NUMBER_OF_STANDING_ORDERS = 5;
     private static final ArrayList<String> verwenundungszwecke = new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
 
     public final String simulationName;
@@ -43,6 +45,7 @@ public class PaySim extends SimState {
 
     private ArrayList<Transaction> transactions = new ArrayList<>();
     private int currentStep;
+    private LocalDateTime currentDateTime;
 
     private Map<ClientActionProfile, Integer> countProfileAssignment = new HashMap<>();
 
@@ -86,6 +89,8 @@ public class PaySim extends SimState {
         cities = CSVReader.read("paramFiles/citiesFiltered.csv");
         distanceMatrix = generateDistanceMatrix();
 
+        currentDateTime = Parameters.startDate;
+
     }
 
     private void runSimulation() {
@@ -101,7 +106,10 @@ public class PaySim extends SimState {
             if (!schedule.step(this))
                 break;
 
+            addHourToCurrentDate();
+
             writeOutputStep();
+
             System.out.println("Step :"+ currentStep);
         }
 
@@ -318,5 +326,13 @@ public class PaySim extends SimState {
 
     public StepActionProfile getStepAction(String action){
         return Parameters.stepsProfiles.getActionForStep(currentStep, action);
+    }
+
+    public LocalDateTime getCurrentDate() {
+        return currentDateTime;
+    }
+
+    public void addHourToCurrentDate(){
+        currentDateTime = currentDateTime.plusHours(1);
     }
 }
