@@ -14,7 +14,6 @@ import paysim.base.Transaction;
 import paysim.actors.Fraudster;
 import paysim.parameters.Parameters;
 import paysim.parameters.StepsProfiles;
-import paysim.utils.DatabaseHandler;
 
 
 public class Output {
@@ -149,14 +148,6 @@ public class Output {
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void writeDatabaseLog(String dbUrl, String dbUser, String dbPassword,
-                                        ArrayList<Transaction> transactions, String simulatorName) {
-        DatabaseHandler handler = new DatabaseHandler(dbUrl, dbUser, dbPassword);
-        for (Transaction t : transactions) {
-            handler.insert(simulatorName, t);
         }
     }
 

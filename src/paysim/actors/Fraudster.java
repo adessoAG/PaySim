@@ -2,7 +2,6 @@ package paysim.actors;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Random;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -29,7 +28,6 @@ public class Fraudster extends SuperActor implements Steppable {
             String fraudCity = paysim.pickRandomCity();
             c.setFraud(true);
             double balance = c.getBalance();
-            // create mule client
             if (balance > 0) {
                 int nbTransactions = (int) Math.ceil(balance / Parameters.transferLimit);
                 for (int i = 0; i < nbTransactions; i++) {

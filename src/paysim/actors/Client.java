@@ -330,7 +330,7 @@ public class Client extends SuperActor implements Steppable {
         return transferFailed;
     }
 
-    boolean handleTransfer(PaySim paysim, int step, double amount, Client clientTo, String place, String verwendungszweck) {
+    private boolean handleTransfer(PaySim paysim, int step, double amount, Client clientTo, String place, String verwendungszweck) {
         return handleTransfer(paysim, step, amount, clientTo, place,
                 paysim.getCurrentDate().plusMinutes(paysim.random.nextInt(60)), verwendungszweck);
     }

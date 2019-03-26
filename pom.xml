@@ -32,13 +32,6 @@
             <version>0663315</version> <!-- Commit corresponding to a Mavenized version of MASON v19  -->
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.tinkerpop/tinkergraph-gremlin -->
-        <dependency>
-            <groupId>org.apache.tinkerpop</groupId>
-            <artifactId>tinkergraph-gremlin</artifactId>
-            <version>3.3.4</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -53,7 +46,5 @@
             <version>3.6.1</version>
         </dependency>
 
-
     </dependencies>
-
 </project>

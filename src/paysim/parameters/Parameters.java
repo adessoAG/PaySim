@@ -18,8 +18,6 @@ public class Parameters {
     public static String aggregatedTransactions, maxOccurrencesPerClient, initialBalancesDistribution,
             overdraftLimits, clientsProfilesFile, transactionsTypes;
     public static String outputPath;
-    public static boolean saveToDB;
-    public static String dbUrl, dbUser, dbPassword;
 
     public static StepsProfiles stepsProfiles;
     public static ClientsProfiles clientsProfiles;
@@ -67,11 +65,6 @@ public class Parameters {
             clientsProfilesFile = parameters.getProperty("clientsProfiles");
 
             outputPath = parameters.getProperty("outputPath");
-
-            saveToDB = parameters.getProperty("saveToDB").equals("1");
-            dbUrl = parameters.getProperty("dbUrl");
-            dbUser = parameters.getProperty("dbUser");
-            dbPassword = parameters.getProperty("dbPassword");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,10 +97,6 @@ public class Parameters {
         properties.add("initialBalancesDistribution=" + initialBalancesDistribution);
         properties.add("maxOccurrencesPerClient=" + maxOccurrencesPerClient);
         properties.add("outputPath=" + outputPath);
-        properties.add("saveToDB=" + saveToDB);
-        properties.add("dbUrl=" + dbUrl);
-        properties.add("dbUser=" + dbUser);
-        properties.add("dbPassword=" + dbPassword);
 
         return String.join(Output.EOL_CHAR, properties);
     }

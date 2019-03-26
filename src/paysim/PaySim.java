@@ -3,11 +3,9 @@ package paysim;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import org.apache.tinkerpop.shaded.jackson.databind.deser.impl.CreatorCandidate;
 import paysim.base.StandingOrder;
 import sim.engine.SimState;
 
@@ -222,11 +220,8 @@ public class PaySim extends SimState {
         totalTransactionsMade += transactions.size();
 
         Output.incrementalWriteRawLog(currentStep, transactions);
-        if (Parameters.saveToDB) {
-            Output.writeDatabaseLog(Parameters.dbUrl, Parameters.dbUser, Parameters.dbPassword, transactions, simulationName);
-        }
-
         Output.incrementalWriteStepAggregate(currentStep, transactions);
+
         resetVariables();
     }
 
@@ -332,7 +327,7 @@ public class PaySim extends SimState {
         return currentDateTime;
     }
 
-    public void addHourToCurrentDate(){
+    private void addHourToCurrentDate(){
         currentDateTime = currentDateTime.plusHours(1);
     }
 }
