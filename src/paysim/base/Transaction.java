@@ -10,9 +10,10 @@ public class Transaction implements Serializable {
     private final int step;
     private final String action;
     private final double amount;
-    //private final String purpose; //Verwendungszweck
 
     private final String nameOrig;
+    private final String place;
+    private final String dateTime;
     private final double oldBalanceOrig, newBalanceOrig;
 
     private final String nameDest;
@@ -24,20 +25,19 @@ public class Transaction implements Serializable {
     private boolean isUnauthorizedOverdraft = false;
 
 
-    public Transaction(int step, String action, double amount, String nameOrig, double oldBalanceOrig,
+    public Transaction(int step, String action, double amount, String nameOrig, String place, int timeInMinutes, double oldBalanceOrig,
                        double newBalanceOrig, String nameDest, double oldBalanceDest, double newBalanceDest) {
         this.step = step;
         this.action = action;
         this.amount = amount;
         this.nameOrig = nameOrig;
+        this.place = place;
+        this.dateTime = setDateTime(timeInMinutes);
         this.oldBalanceOrig = oldBalanceOrig;
         this.newBalanceOrig = newBalanceOrig;
         this.nameDest = nameDest;
         this.oldBalanceDest = oldBalanceDest;
         this.newBalanceDest = newBalanceDest;
-        //verwendungszweck
-      //  this.purpose= purpose;
-
     }
 
     public boolean isFailedTransaction(){
@@ -56,12 +56,6 @@ public class Transaction implements Serializable {
         this.isUnauthorizedOverdraft = isUnauthorizedOverdraft;
     }
 
-        /*
-    public String getPurpose(){
-        return this.purpose;
-    }
-
-*/
     public boolean isFlaggedFraud() {
         return isFlaggedFraud;
     }
@@ -106,6 +100,12 @@ public class Transaction implements Serializable {
         return newBalanceDest;
     }
 
+    private String setDateTime(int timeInMinutes){
+        int hour = timeInMinutes / 60;
+        int min = timeInMinutes % 60;
+        return String.format("%02d:%02d", hour, min);
+    }
+
     @Override
     public String toString(){
         ArrayList<String> properties = new ArrayList<>();
@@ -114,6 +114,8 @@ public class Transaction implements Serializable {
         properties.add(action);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, amount));
         properties.add(nameOrig);
+        properties.add(place);
+        properties.add(dateTime);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, oldBalanceOrig));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, newBalanceOrig));
         properties.add(nameDest);
