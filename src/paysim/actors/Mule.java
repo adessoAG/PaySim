@@ -3,6 +3,8 @@ package paysim.actors;
 import paysim.PaySim;
 import paysim.base.Transaction;
 
+import java.time.LocalDateTime;
+
 public class Mule extends Client {
     private static final String MULE_IDENTIFIER = "C";
 
@@ -11,7 +13,7 @@ public class Mule extends Client {
         this.overdraftLimit = 0;
     }
 
-    void fraudulentCashOut(PaySim paysim, int step, double amount, int timeInMinutes) {
+    void fraudulentCashOut(PaySim paysim, int step, double amount, LocalDateTime dateTime) {
         String action = "CASH_OUT";
 
         Merchant merchantTo = paysim.pickRandomMerchant();
@@ -25,7 +27,10 @@ public class Mule extends Client {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
-        Transaction t = new Transaction(step, action, amount, nameOrig, getPlace(), timeInMinutes, oldBalanceOrig,
+        String verwendungszweck = action + "_" + nameOrig + "_" + nameDest;
+
+        Transaction t = new Transaction(step, action, amount, nameOrig, getPlace(),
+                dateTime.plusMinutes(paysim.random.nextInt(30)), verwendungszweck, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
         t.setFraud(this.isFraud());
         paysim.getTransactions().add(t);

@@ -1,6 +1,8 @@
 package paysim.base;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import paysim.output.Output;
@@ -13,7 +15,8 @@ public class Transaction implements Serializable {
 
     private final String nameOrig;
     private final String place;
-    private final String dateTime;
+    private final LocalDateTime dateTime;
+    private final String verwendungszweck;
     private final double oldBalanceOrig, newBalanceOrig;
 
     private final String nameDest;
@@ -25,14 +28,16 @@ public class Transaction implements Serializable {
     private boolean isUnauthorizedOverdraft = false;
 
 
-    public Transaction(int step, String action, double amount, String nameOrig, String place, int timeInMinutes, double oldBalanceOrig,
-                       double newBalanceOrig, String nameDest, double oldBalanceDest, double newBalanceDest) {
+    public Transaction(int step, String action, double amount, String nameOrig, String place, LocalDateTime dateTime,
+                       String verwendungszweck, double oldBalanceOrig, double newBalanceOrig, String nameDest,
+                       double oldBalanceDest, double newBalanceDest) {
         this.step = step;
         this.action = action;
         this.amount = amount;
         this.nameOrig = nameOrig;
         this.place = place;
-        this.dateTime = setDateTime(timeInMinutes);
+        this.dateTime = dateTime;
+        this.verwendungszweck = verwendungszweck;
         this.oldBalanceOrig = oldBalanceOrig;
         this.newBalanceOrig = newBalanceOrig;
         this.nameDest = nameDest;
@@ -100,12 +105,6 @@ public class Transaction implements Serializable {
         return newBalanceDest;
     }
 
-    private String setDateTime(int timeInMinutes){
-        int hour = timeInMinutes / 60;
-        int min = timeInMinutes % 60;
-        return String.format("%02d:%02d", hour, min);
-    }
-
     @Override
     public String toString(){
         ArrayList<String> properties = new ArrayList<>();
@@ -115,7 +114,9 @@ public class Transaction implements Serializable {
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, amount));
         properties.add(nameOrig);
         properties.add(place);
-        properties.add(dateTime);
+        properties.add(dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        properties.add(dateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        properties.add(verwendungszweck);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, oldBalanceOrig));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, newBalanceOrig));
         properties.add(nameDest);

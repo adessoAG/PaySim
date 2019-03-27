@@ -3,8 +3,10 @@ package paysim;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
+import paysim.base.StandingOrder;
 import sim.engine.SimState;
 
 import paysim.parameters.*;
@@ -25,6 +27,7 @@ import paysim.utils.CSVReader;
 public class PaySim extends SimState {
     private static final double PAYSIM_VERSION = 1.0;
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
+    private static final ArrayList<String> verwenundungszwecke = new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
 
     public final String simulationName;
     private int totalTransactionsMade = 0;
@@ -40,6 +43,7 @@ public class PaySim extends SimState {
 
     private ArrayList<Transaction> transactions = new ArrayList<>();
     private int currentStep;
+    private LocalDateTime currentDateTime;
 
     private Map<ClientActionProfile, Integer> countProfileAssignment = new HashMap<>();
 
@@ -83,6 +87,8 @@ public class PaySim extends SimState {
         cities = CSVReader.read("paramFiles/citiesFiltered.csv");
         distanceMatrix = generateDistanceMatrix();
 
+        currentDateTime = Parameters.startDate;
+
     }
 
     private void runSimulation() {
@@ -98,7 +104,10 @@ public class PaySim extends SimState {
             if (!schedule.step(this))
                 break;
 
+            addHourToCurrentDate();
+
             writeOutputStep();
+
             System.out.println("Step :"+ currentStep);
         }
 
@@ -160,9 +169,23 @@ public class PaySim extends SimState {
         }
 
         //Schedule clients to act at each step of the simulation
+        //and add StandingOrders for each Client
         for (Client c : clients) {
+            c.setStandingOrders(generateStandingOrders(c.getName()));
             schedule.scheduleRepeating(c);
         }
+    }
+
+    private ArrayList<StandingOrder> generateStandingOrders(String nameOrig) {
+        ArrayList<String> listOfVWZ = new ArrayList<>(verwenundungszwecke);
+        int number = random.nextInt(listOfVWZ.size());
+        int randomVWZ;
+        ArrayList<StandingOrder> standingOrders = new ArrayList<>();
+        for(int i=0; i < number; i++){
+            randomVWZ = random.nextInt(listOfVWZ.size());
+            standingOrders.add(new StandingOrder(pickRandomClient(nameOrig), listOfVWZ.remove(randomVWZ)));
+        }
+        return standingOrders;
     }
 
     private Map<String, ClientActionProfile> pickNextClientProfile() {
@@ -197,11 +220,8 @@ public class PaySim extends SimState {
         totalTransactionsMade += transactions.size();
 
         Output.incrementalWriteRawLog(currentStep, transactions);
-        if (Parameters.saveToDB) {
-            Output.writeDatabaseLog(Parameters.dbUrl, Parameters.dbUser, Parameters.dbPassword, transactions, simulationName);
-        }
-
         Output.incrementalWriteStepAggregate(currentStep, transactions);
+
         resetVariables();
     }
 
@@ -263,6 +283,10 @@ public class PaySim extends SimState {
         return cities.get(random_int)[3];
     }
 
+    public String pickRandomVerwendungszweck(){
+        return verwenundungszwecke.get(random.nextInt(verwenundungszwecke.size()));
+    }
+
     public int getTotalTransactions() {
         return totalTransactionsMade;
     }
@@ -297,5 +321,13 @@ public class PaySim extends SimState {
 
     public StepActionProfile getStepAction(String action){
         return Parameters.stepsProfiles.getActionForStep(currentStep, action);
+    }
+
+    public LocalDateTime getCurrentDate() {
+        return currentDateTime;
+    }
+
+    private void addHourToCurrentDate(){
+        currentDateTime = currentDateTime.plusHours(1);
     }
 }

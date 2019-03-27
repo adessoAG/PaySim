@@ -14,7 +14,6 @@ import paysim.base.Transaction;
 import paysim.actors.Fraudster;
 import paysim.parameters.Parameters;
 import paysim.parameters.StepsProfiles;
-import paysim.utils.DatabaseHandler;
 
 
 public class Output {
@@ -24,7 +23,7 @@ public class Output {
             filenameStepAggregate, filenameClientProfiles, filenameFraudsters;
 
     public static void incrementalWriteRawLog(int step, ArrayList<Transaction> transactions) {
-        String rawLogHeader = "step,action,amount,nameOrig,place,datetime,oldBalanceOrig,newBalanceOrig,nameDest,oldBalanceDest,newBalanceDest,isFraud,isFlaggedFraud,isUnauthorizedOverdraft";
+        String rawLogHeader = "step,action,amount,nameOrig,place,date,datetime,verwendungszweck,oldBalanceOrig,newBalanceOrig,nameDest,oldBalanceDest,newBalanceDest,isFraud,isFlaggedFraud,isUnauthorizedOverdraft";
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filenameRawLog, true));
             if (step == 0) {
@@ -149,14 +148,6 @@ public class Output {
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void writeDatabaseLog(String dbUrl, String dbUser, String dbPassword,
-                                        ArrayList<Transaction> transactions, String simulatorName) {
-        DatabaseHandler handler = new DatabaseHandler(dbUrl, dbUser, dbPassword);
-        for (Transaction t : transactions) {
-            handler.insert(simulatorName, t);
         }
     }
 
