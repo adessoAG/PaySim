@@ -1,19 +1,15 @@
 package paysim.output;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import paysim.PaySim;
-import paysim.base.StepActionProfile;
 import paysim.base.ClientActionProfile;
 import paysim.base.Transaction;
 import paysim.actors.Fraudster;
 import paysim.parameters.Parameters;
-import paysim.parameters.StepsProfiles;
 
 
 public class Output {
@@ -39,27 +35,6 @@ public class Output {
             e.printStackTrace();
         }
     }
-
-    public static void incrementalWriteStepAggregate(int step, ArrayList<Transaction> transactions) {
-        String stepAggregateHeader = "action,month,day,hour,count,sum,avg,std,step";
-        Map<String, StepActionProfile> stepRecord = Aggregator.generateStepAggregate(step, transactions);
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(filenameStepAggregate, true));
-            if (step == 0) {
-                writer.write(stepAggregateHeader);
-                writer.newLine();
-            }
-            for (StepActionProfile actionRecord : stepRecord.values()) {
-                writer.write(actionRecord.toString());
-                writer.newLine();
-            }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
 
     public static void writeFraudsters(ArrayList<Fraudster> fraudsters) {
         String fraudsterHeader = "name,nbVictims,profit";
@@ -111,46 +86,6 @@ public class Output {
         }
     }
 
-    public static void writeSummarySimulation(PaySim paySim) {
-        StringBuilder errorSummary = new StringBuilder();
-        StepsProfiles simulationStepsProfiles = new StepsProfiles(Output.filenameStepAggregate, 1 / Parameters.multiplier, Parameters.nbSteps);
-        double totalErrorRate = SummaryBuilder.buildSummary(Parameters.stepsProfiles, simulationStepsProfiles, errorSummary);
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(Output.filenameSummary));
-            writer.write(errorSummary.toString());
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        String summary = paySim.simulationName + "," + Parameters.nbSteps + "," + paySim.getTotalTransactions() + "," +
-                paySim.getClients().size() + "," + totalErrorRate;
-        writeGlobalSummary(summary);
-
-        System.out.println("Nb of clients: " + paySim.getClients().size() + " - Nb of steps with transactions: " + paySim.getStepParticipated());
-        //System.out.println("time:"+ " " + writeVirtual_time());
-    }
-
-    private static void writeGlobalSummary(String summary) {
-        String header = "name,steps,nbTransactions,nbClients,totalError";
-        File f = new File(filenameGlobalSummary);
-        boolean fileExists = f.exists();
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(f, true));
-            if (!fileExists) {
-                writer.write(header);
-                writer.newLine();
-            }
-            writer.write(summary);
-            writer.newLine();
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     //See https://stackoverflow.com/a/10554128
     private static final int[] POW10 = {1, 10, 100, 1000, 10000, 100000, 1000000};
 
@@ -177,13 +112,10 @@ public class Output {
 
     public static void initOutputFilenames(String simulatorName) {
         String outputBaseString = Parameters.outputPath + simulatorName + "//" + simulatorName;
-        filenameGlobalSummary = Parameters.outputPath + "summary.csv";
 
         filenameParameters = outputBaseString + "_PaySim.properties";
-        filenameSummary = outputBaseString + "_Summary.txt";
 
         filenameRawLog = outputBaseString + "_rawLog.csv";
-        filenameStepAggregate = outputBaseString + "_aggregatedTransactions.csv";
         filenameClientProfiles = outputBaseString + "_clientsProfiles.csv";
         filenameFraudsters = outputBaseString + "_fraudsters.csv";
     }
