@@ -1,8 +1,7 @@
 package paysim.actors;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.ArrayList;
 import static java.lang.Math.max;
@@ -91,8 +90,8 @@ public class Client extends SuperActor implements Steppable {
                 // so we can set amount directly into  the parameter amount but if this changes we need to do like in makeTransaction
                 handleTransfer(paySim, step, standingOrder.getAmount(), standingOrder.getClientTo(), place,
                         standingOrder.getVerwendungszweck());
-                LocalDate nextDateForTransaction = paySim.getCurrentDate().plusMonths(1).toLocalDate();
-                standingOrder.setNextStep(Period.between(paySim.getCurrentDate().toLocalDate(), nextDateForTransaction).getDays()*24);
+                LocalDateTime nextDateForTransaction = paySim.getCurrentDate().plusMonths(1);
+                standingOrder.setNextStep((int) ChronoUnit.HOURS.between(paySim.getCurrentDate(), nextDateForTransaction));
             }
         }
 
