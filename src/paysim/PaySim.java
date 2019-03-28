@@ -69,7 +69,6 @@ public class PaySim extends SimState {
     }
 
     
-    
     public PaySim() {
         super(Parameters.getSeed());
         BalancesClients.setRandom(random);

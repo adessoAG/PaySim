@@ -1,10 +1,6 @@
 package paysim.actors;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.ArrayList;
@@ -52,7 +48,7 @@ public class Client extends SuperActor implements Steppable {
         this.bank = bank;
         this.place = place;
         this.movement = new ParetoDistribution(0.0001, (double) 1);
-        this.activity = new PoissonDistribution(0.01);
+        this.activity = new PoissonDistribution(0.1);
         this.clientProfile = new ClientProfile(profile, random);
         this.balance = initBalance;
         this.overdraftLimit = pickOverdraftLimit(random);
