@@ -21,6 +21,8 @@ public class Parameters {
 
     public static ClientsProfiles clientsProfiles;
 
+    public static double movementShape, activityMean;
+
     public static void initParameters(String propertiesFile) {
         loadPropertiesFile(propertiesFile);
 
@@ -61,6 +63,9 @@ public class Parameters {
             overdraftLimits = parameters.getProperty("overdraftLimits");
             clientsProfilesFile = parameters.getProperty("clientsProfiles");
 
+            movementShape = Double.parseDouble(parameters.getProperty("movementShape"));
+            activityMean = Double.parseDouble(parameters.getProperty("activityMean"));
+
             outputPath = parameters.getProperty("outputPath");
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,6 +93,8 @@ public class Parameters {
         properties.add("startDate=" +  startDate);
         properties.add("fraudProbability=" + fraudProbability);
         properties.add("transferLimit=" + transferLimit);
+        properties.add("movementShape=" + movementShape);
+        properties.add("activityMean=" + activityMean);
         properties.add("transactionsTypes=" + transactionsTypes);
         properties.add("clientsProfilesFile=" + clientsProfilesFile);
         properties.add("initialBalancesDistribution=" + initialBalancesDistribution);

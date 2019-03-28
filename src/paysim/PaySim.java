@@ -23,8 +23,6 @@ import paysim.output.Output;
 
 import paysim.utils.CSVReader;
 
-import javax.xml.stream.events.StartDocument;
-
 public class PaySim extends SimState {
     private static final double PAYSIM_VERSION = 1.0;
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
@@ -163,7 +161,7 @@ public class PaySim extends SimState {
                     pickRandomBank(),
                     pickNextClientProfile(),
                     BalancesClients.pickNextBalance(random),
-                    pickRandomCity(), random);
+                    pickRandomCity(), Parameters.movementShape, Parameters.activityMean, random);
             clients.add(c);
         }
 

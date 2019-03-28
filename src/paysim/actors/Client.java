@@ -42,13 +42,13 @@ public class Client extends SuperActor implements Steppable {
         this.place = place;
     }
 
-    public Client(String name, Bank bank, Map<String, ClientActionProfile> profile, double initBalance,
-                  String place, MersenneTwisterFast random) {
+    public Client(String name, Bank bank, Map<String, ClientActionProfile> profile, double initBalance, String place,
+                  double movementShape, double activityMean, MersenneTwisterFast random) {
         super(CLIENT_IDENTIFIER + name);
         this.bank = bank;
         this.place = place;
-        this.movement = new ParetoDistribution(0.0001, (double) 1);
-        this.activity = new PoissonDistribution(0.1);
+        this.movement = new ParetoDistribution(0.0001, movementShape);
+        this.activity = new PoissonDistribution(activityMean);
         this.clientProfile = new ClientProfile(profile, random);
         this.balance = initBalance;
         this.overdraftLimit = pickOverdraftLimit(random);
