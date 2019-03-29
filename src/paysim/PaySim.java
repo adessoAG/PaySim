@@ -24,7 +24,7 @@ import paysim.output.Output;
 import paysim.utils.CSVReader;
 
 public class PaySim extends SimState {
-    private static final double PAYSIM_VERSION = 1.0;
+    private static final double PAYSIM_VERSION = 0.6;
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
     private static final ArrayList<String> verwenundungszwecke = new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
 
