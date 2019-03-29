@@ -15,12 +15,13 @@ public class Parameters {
     public static int nbClients, nbMerchants, nbBanks, nbFraudsters, nbSteps;
     public static LocalDateTime startDate;
     public static double multiplier, fraudProbability, transferLimit;
-    public static String aggregatedTransactions, maxOccurrencesPerClient, initialBalancesDistribution,
+    public static String maxOccurrencesPerClient, initialBalancesDistribution,
             overdraftLimits, clientsProfilesFile, transactionsTypes;
     public static String outputPath;
 
-    public static StepsProfiles stepsProfiles;
     public static ClientsProfiles clientsProfiles;
+
+    public static double movementShape, activityMean;
 
     public static void initParameters(String propertiesFile) {
         loadPropertiesFile(propertiesFile);
@@ -29,7 +30,6 @@ public class Parameters {
         BalancesClients.initBalanceClients(initialBalancesDistribution);
         BalancesClients.initOverdraftLimits(overdraftLimits);
         clientsProfiles = new ClientsProfiles(clientsProfilesFile);
-        stepsProfiles = new StepsProfiles(aggregatedTransactions, multiplier, nbSteps);
         ActionTypes.loadMaxOccurrencesPerClient(maxOccurrencesPerClient);
     }
 
@@ -58,11 +58,13 @@ public class Parameters {
             transferLimit = Double.parseDouble(parameters.getProperty("transferLimit"));
 
             transactionsTypes = parameters.getProperty("transactionsTypes");
-            aggregatedTransactions = parameters.getProperty("aggregatedTransactions");
             maxOccurrencesPerClient = parameters.getProperty("maxOccurrencesPerClient");
             initialBalancesDistribution = parameters.getProperty("initialBalancesDistribution");
             overdraftLimits = parameters.getProperty("overdraftLimits");
             clientsProfilesFile = parameters.getProperty("clientsProfiles");
+
+            movementShape = Double.parseDouble(parameters.getProperty("movementShape"));
+            activityMean = Double.parseDouble(parameters.getProperty("activityMean"));
 
             outputPath = parameters.getProperty("outputPath");
         } catch (Exception e) {
@@ -91,8 +93,9 @@ public class Parameters {
         properties.add("startDate=" +  startDate);
         properties.add("fraudProbability=" + fraudProbability);
         properties.add("transferLimit=" + transferLimit);
+        properties.add("movementShape=" + movementShape);
+        properties.add("activityMean=" + activityMean);
         properties.add("transactionsTypes=" + transactionsTypes);
-        properties.add("aggregatedTransactions=" + aggregatedTransactions);
         properties.add("clientsProfilesFile=" + clientsProfilesFile);
         properties.add("initialBalancesDistribution=" + initialBalancesDistribution);
         properties.add("maxOccurrencesPerClient=" + maxOccurrencesPerClient);

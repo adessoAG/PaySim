@@ -18,14 +18,13 @@ import paysim.actors.Merchant;
 
 import paysim.base.Transaction;
 import paysim.base.ClientActionProfile;
-import paysim.base.StepActionProfile;
 
 import paysim.output.Output;
 
 import paysim.utils.CSVReader;
 
 public class PaySim extends SimState {
-    private static final double PAYSIM_VERSION = 1.0;
+    private static final double PAYSIM_VERSION = 0.6;
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
     private static final ArrayList<String> verwenundungszwecke = new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
 
@@ -67,7 +66,6 @@ public class PaySim extends SimState {
         }
     }
 
-    
     
     public PaySim() {
         super(Parameters.getSeed());
@@ -163,17 +161,20 @@ public class PaySim extends SimState {
                     pickRandomBank(),
                     pickNextClientProfile(),
                     BalancesClients.pickNextBalance(random),
-                    pickRandomCity(), random,
-                    Parameters.stepsProfiles.getTotalTargetCount());
+                    pickRandomCity(), Parameters.movementShape, Parameters.activityMean, random);
             clients.add(c);
         }
 
         //Schedule clients to act at each step of the simulation
         //and add StandingOrders for each Client
+        int sum = 0;
         for (Client c : clients) {
-            c.setStandingOrders(generateStandingOrders(c.getName()));
+            ArrayList<StandingOrder> orders = generateStandingOrders(c.getName());
+            sum += orders.size();
+            c.setStandingOrders(orders);
             schedule.scheduleRepeating(c);
         }
+        System.out.println("Number of standing orders:" +  sum);
     }
 
     private ArrayList<StandingOrder> generateStandingOrders(String nameOrig) {
@@ -204,7 +205,6 @@ public class PaySim extends SimState {
     public void finish() {
         Output.writeFraudsters(fraudsters);
         Output.writeClientsProfiles(countProfileAssignment, (int) (Parameters.nbClients * Parameters.multiplier));
-        Output.writeSummarySimulation(this);
     }
 
     private void resetVariables() {
@@ -220,7 +220,6 @@ public class PaySim extends SimState {
         totalTransactionsMade += transactions.size();
 
         Output.incrementalWriteRawLog(currentStep, transactions);
-        Output.incrementalWriteStepAggregate(currentStep, transactions);
 
         resetVariables();
     }
@@ -309,18 +308,6 @@ public class PaySim extends SimState {
 
     public String getCityByIndex(int index){
         return cities.get(index)[3];
-    }
-
-    public int getStepTargetCount() {
-        return Parameters.stepsProfiles.getTargetCount(currentStep);
-    }
-
-    public Map<String, Double> getStepProbabilities(){
-        return Parameters.stepsProfiles.getProbabilitiesPerStep(currentStep);
-    }
-
-    public StepActionProfile getStepAction(String action){
-        return Parameters.stepsProfiles.getActionForStep(currentStep, action);
     }
 
     public LocalDateTime getCurrentDate() {

@@ -12,8 +12,8 @@ import paysim.parameters.ActionTypes;
 import paysim.parameters.BalancesClients;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import sim.util.distribution.Binomial;
 import org.apache.commons.math3.distribution.ParetoDistribution;
+import org.apache.commons.math3.distribution.PoissonDistribution;
 
 import paysim.PaySim;
 import paysim.parameters.Parameters;
@@ -30,8 +30,8 @@ public class Client extends SuperActor implements Steppable {
     private final Bank bank;
     private String place;
     private ParetoDistribution movement;
+    private PoissonDistribution activity;
     private ClientProfile clientProfile;
-    private double clientWeight;
     private double balanceMax = 0;
     private int countTransferTransactions = 0;
     private ArrayList<StandingOrder> standingOrders;
@@ -42,18 +42,17 @@ public class Client extends SuperActor implements Steppable {
         this.place = place;
     }
 
-    public Client(String name, Bank bank, Map<String, ClientActionProfile> profile, double initBalance,
-                  String place, MersenneTwisterFast random, int totalTargetCount) {
+    public Client(String name, Bank bank, Map<String, ClientActionProfile> profile, double initBalance, String place,
+                  double movementShape, double activityMean, MersenneTwisterFast random) {
         super(CLIENT_IDENTIFIER + name);
         this.bank = bank;
         this.place = place;
-        this.movement = new ParetoDistribution(0.0001, (double) 1);
+        this.movement = new ParetoDistribution(0.0001, movementShape);
+        this.activity = new PoissonDistribution(activityMean);
         this.clientProfile = new ClientProfile(profile, random);
-        this.clientWeight = ((double) clientProfile.getClientTargetCount()) / totalTargetCount;
         this.balance = initBalance;
         this.overdraftLimit = pickOverdraftLimit(random);
     }
-
 
     public String getPlace() {
         return place;
@@ -91,23 +90,16 @@ public class Client extends SuperActor implements Steppable {
                 handleTransfer(paySim, step, standingOrder.getAmount(), standingOrder.getClientTo(), place,
                         standingOrder.getVerwendungszweck());
                 LocalDateTime nextDateForTransaction = paySim.getCurrentDate().plusMonths(1);
-                standingOrder.setNextStep((int) ChronoUnit.HOURS.between(paySim.getCurrentDate(), nextDateForTransaction));
+                standingOrder.setNextStep((int)ChronoUnit.HOURS.between(paySim.getCurrentDate(), nextDateForTransaction));
             }
         }
-
-        int stepTargetCount = paySim.getStepTargetCount();
-        if (stepTargetCount > 0) {
-            Map<String, Double> stepActionProfile = paySim.getStepProbabilities();
-
-            int count = pickCount(random, stepTargetCount);
-            for (int t = 0; t < count; t++) {
-                String action = pickAction(random, stepActionProfile);
-                StepActionProfile stepAmountProfile = paySim.getStepAction(action);
-                if(isPreferredTime(random, action, (step % 24)*60)) {
-                    double amount = pickAmount(random, action, stepAmountProfile);
-                    String randomPlace = paySim.getCityByIndex(getRandomPlace(paySim.getDistances(place)));
-                    makeTransaction(paySim, step, action, amount, randomPlace);
-                }
+        int count = activity.sample();
+        for (int t = 0; t < count; t++) {
+            String action = pickAction(random);
+            if(isPreferredTime(random, action, (step % 24)*60)) {
+                double amount = pickAmount(random, action);
+                String randomPlace = paySim.getCityByIndex(getRandomPlace(paySim.getDistances(place)));
+                makeTransaction(paySim, step, action, amount, randomPlace);
             }
         }
     }
@@ -118,46 +110,24 @@ public class Client extends SuperActor implements Steppable {
         return randomNum <= probability;
     }
 
-    private int pickCount(MersenneTwisterFast random, int targetStepCount) {
-        // B(n,p): n = targetStepCount & p = clientWeight
-        Binomial transactionNb = new Binomial(targetStepCount, clientWeight, random);
-        return transactionNb.nextInt();
-    }
-
-    private String pickAction(MersenneTwisterFast random, Map<String, Double> stepActionProb) {
+    private String pickAction(MersenneTwisterFast random) {
         Map<String, Double> clientProbabilities = clientProfile.getActionProbability();
         RandomCollection<String> actionPicker = new RandomCollection<>(random);
 
         for (Map.Entry<String, Double> clientEntry : clientProbabilities.entrySet()) {
             String action = clientEntry.getKey();
             double clientProbability = clientEntry.getValue();
-            double finalProbability;
-
-            if (stepActionProb.containsKey(action)) {
-                double stepProbability = stepActionProb.get(action);
-
-                finalProbability = (clientProbability + stepProbability) / 2;
-            } else {
-                finalProbability = clientProbability;
-            }
-            actionPicker.add(finalProbability, action);
+            actionPicker.add(clientProbability, action);
         }
 
         return actionPicker.next();
     }
 
-    private double pickAmount(MersenneTwisterFast random, String action, StepActionProfile stepAmountProfile) {
+    private double pickAmount(MersenneTwisterFast random, String action) {
         ClientActionProfile clientAmountProfile = clientProfile.getProfilePerAction(action);
 
-        double average, std;
-        if (stepAmountProfile != null) {
-            // We take the mean between the two distributions
-            average = (clientAmountProfile.getAvgAmount() + stepAmountProfile.getAvgAmount()) / 2;
-            std = Math.sqrt((Math.pow(clientAmountProfile.getStdAmount(), 2) + Math.pow(stepAmountProfile.getStdAmount(), 2))) / 2;
-        } else {
-            average = clientAmountProfile.getAvgAmount();
-            std = clientAmountProfile.getStdAmount();
-        }
+        double average = clientAmountProfile.getAvgAmount();
+        double std = clientAmountProfile.getStdAmount();
 
         double amount = -1;
         while (amount <= 0) {
