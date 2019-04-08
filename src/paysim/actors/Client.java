@@ -29,6 +29,7 @@ public class Client extends SuperActor implements Steppable {
             PAYMENT = "PAYMENT", TRANSFER = "TRANSFER", DEPOSIT = "DEPOSIT";
     private final Bank bank;
     private String place;
+    private String lastTransactionPlace;
     private ParetoDistribution movement;
     private PoissonDistribution activity;
     private ClientProfile clientProfile;
@@ -47,6 +48,7 @@ public class Client extends SuperActor implements Steppable {
         super(CLIENT_IDENTIFIER + name);
         this.bank = bank;
         this.place = place;
+        this.lastTransactionPlace = place;
         this.movement = new ParetoDistribution(0.0001, movementShape);
         this.activity = new PoissonDistribution(activityMean);
         this.clientProfile = new ClientProfile(profile, random);
@@ -58,11 +60,15 @@ public class Client extends SuperActor implements Steppable {
         return place;
     }
 
+    public String getLastTransactionPlace(){
+        return lastTransactionPlace;
+    }
+
     public void setStandingOrders(ArrayList<StandingOrder> standingOrders){
         this.standingOrders = standingOrders;
     }
 
-    private int getRandomPlace(double[] distances){
+    public int getRandomPlace(double[] distances){
         double randomDistance = movement.sample();
         int indexOfCity = 0;
         double minimum = Math.abs(distances[0] - randomDistance);
@@ -91,6 +97,7 @@ public class Client extends SuperActor implements Steppable {
                         standingOrder.getVerwendungszweck());
                 LocalDateTime nextDateForTransaction = paySim.getCurrentDate().plusMonths(1);
                 standingOrder.setNextStep((int)ChronoUnit.HOURS.between(paySim.getCurrentDate(), nextDateForTransaction));
+                lastTransactionPlace = place;
             }
         }
         int count = activity.sample();
@@ -100,6 +107,7 @@ public class Client extends SuperActor implements Steppable {
                 double amount = pickAmount(random, action);
                 String randomPlace = paySim.getCityByIndex(getRandomPlace(paySim.getDistances(place)));
                 makeTransaction(paySim, step, action, amount, randomPlace);
+                lastTransactionPlace = randomPlace;
             }
         }
     }
