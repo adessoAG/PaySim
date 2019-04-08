@@ -25,7 +25,7 @@ public class Fraudster extends SuperActor implements Steppable {
         int step = (int) state.schedule.getSteps();
         if (paysim.random.nextDouble() < Parameters.fraudProbability) {
             Client c = paysim.pickRandomClient(getName());
-            String fraudCity = paysim.pickRandomCity();
+            String fraudCity = paysim.getCityByIndex(c.getRandomPlace(paysim.getDistances(c.getLastTransactionPlace())));
             c.setFraud(true);
             double balance = c.getBalance();
             if (balance > 0) {
