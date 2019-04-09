@@ -18,13 +18,14 @@ PaySim, a Mobile Money Payment Simulator The Mobile Money Payment Simulation cas
 
 ## Installation and Usage
 First you can use one of the GitHub-releases. The releases are compiled and just need to be extracted. After that you can use.
+```bash
+  java -jar paysim.jar
+ ```
 
-  &nbsp;&nbsp;&nbsp;&nbsp; java -jar paysim.jar
-  
 The other option is to compile the Java sources by yourself. The project is an maven project. Thus you can build it with the standard maven command
-
-  &nbsp;&nbsp;&nbsp;&nbsp; mvn package
-  
+```bash
+  mvn clean package
+```  
 Again you have a jar application which you can execute.
 
 
