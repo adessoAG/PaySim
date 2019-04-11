@@ -105,6 +105,10 @@ public class Transaction implements Serializable {
         return newBalanceDest;
     }
 
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
     @Override
     public String toString(){
         ArrayList<String> properties = new ArrayList<>();

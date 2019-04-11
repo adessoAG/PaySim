@@ -23,6 +23,8 @@ public class Parameters {
 
     public static double movementShape, activityMean;
 
+    public static String kafkaTopic;
+
     public static void initParameters(String propertiesFile) {
         loadPropertiesFile(propertiesFile);
 
@@ -66,6 +68,8 @@ public class Parameters {
             movementShape = Double.parseDouble(parameters.getProperty("movementShape"));
             activityMean = Double.parseDouble(parameters.getProperty("activityMean"));
 
+            kafkaTopic = parameters.getProperty("kafkaTopic");
+
             outputPath = parameters.getProperty("outputPath");
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,6 +104,7 @@ public class Parameters {
         properties.add("initialBalancesDistribution=" + initialBalancesDistribution);
         properties.add("maxOccurrencesPerClient=" + maxOccurrencesPerClient);
         properties.add("outputPath=" + outputPath);
+        properties.add("kafkaTopic=" + kafkaTopic);
 
         return String.join(Output.EOL_CHAR, properties);
     }

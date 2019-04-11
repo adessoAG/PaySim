@@ -20,6 +20,7 @@ import paysim.base.Transaction;
 import paysim.base.ClientActionProfile;
 
 import paysim.output.Output;
+import paysim.output.KafkaOutput;
 
 import paysim.utils.CSVReader;
 
@@ -45,6 +46,8 @@ public class PaySim extends SimState {
     private LocalDateTime currentDateTime;
 
     private Map<ClientActionProfile, Integer> countProfileAssignment = new HashMap<>();
+
+    private KafkaOutput kafkaOutput;
 
 
     public static void main(String[] args) {
@@ -86,6 +89,8 @@ public class PaySim extends SimState {
         distanceMatrix = generateDistanceMatrix();
 
         currentDateTime = Parameters.startDate;
+
+        kafkaOutput = new KafkaOutput(Parameters.kafkaTopic);
 
     }
 
@@ -205,6 +210,7 @@ public class PaySim extends SimState {
     public void finish() {
         Output.writeFraudsters(fraudsters);
         Output.writeClientsProfiles(countProfileAssignment, (int) (Parameters.nbClients * Parameters.multiplier));
+        kafkaOutput.closeProducer();
     }
 
     private void resetVariables() {
@@ -220,6 +226,7 @@ public class PaySim extends SimState {
         totalTransactionsMade += transactions.size();
 
         Output.incrementalWriteRawLog(currentStep, transactions);
+        kafkaOutput.sendTransactionsToKafka(transactions);
 
         resetVariables();
     }
