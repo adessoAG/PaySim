@@ -26,7 +26,7 @@ import paysim.utils.CSVReader;
 
 public class PaySim extends SimState {
     private static final double PAYSIM_VERSION = 0.6;
-    private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
+    private static final String[] DEFAULT_ARGS = new String[]{"-file", "PaySim.properties", "1", "on"};
     private static final ArrayList<String> verwenundungszwecke = new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
 
     public final String simulationName;
@@ -48,6 +48,7 @@ public class PaySim extends SimState {
     private Map<ClientActionProfile, Integer> countProfileAssignment = new HashMap<>();
 
     private KafkaOutput kafkaOutput;
+    private boolean withoutKafka;
 
 
     public static void main(String[] args) {
@@ -55,22 +56,23 @@ public class PaySim extends SimState {
         if (args.length < 4) {
             args = DEFAULT_ARGS;
         }
-        int nbTimesRepeat = Integer.parseInt(args[3]);
+        int nbTimesRepeat = Integer.parseInt(args[2]);
         String propertiesFile = "";
-        for (int x = 0; x < args.length - 1; x++) {
+        for (int x = 0; x < args.length - 2; x++) {
             if (args[x].equals("-file")) {
                 propertiesFile = args[x + 1];
             }
         }
         Parameters.initParameters(propertiesFile);
         for (int i = 0; i < nbTimesRepeat; i++) {
-            PaySim p = new PaySim();
+            boolean isKafka = args[3].equals("on");
+            PaySim p = new PaySim(isKafka);
             p.runSimulation();
         }
     }
 
     
-    public PaySim() {
+    public PaySim(boolean isKafka) {
         super(Parameters.getSeed());
         BalancesClients.setRandom(random);
         Parameters.clientsProfiles.setRandom(random);
@@ -90,7 +92,10 @@ public class PaySim extends SimState {
 
         currentDateTime = Parameters.startDate;
 
-        kafkaOutput = new KafkaOutput(Parameters.kafkaTopic);
+        withoutKafka = isKafka;
+        if (withoutKafka)
+            kafkaOutput = new KafkaOutput(Parameters.kafkaTopic);
+
 
     }
 
@@ -210,7 +215,8 @@ public class PaySim extends SimState {
     public void finish() {
         Output.writeFraudsters(fraudsters);
         Output.writeClientsProfiles(countProfileAssignment, (int) (Parameters.nbClients * Parameters.multiplier));
-        kafkaOutput.closeProducer();
+        if (withoutKafka)
+            kafkaOutput.closeProducer();
     }
 
     private void resetVariables() {
@@ -226,7 +232,8 @@ public class PaySim extends SimState {
         totalTransactionsMade += transactions.size();
 
         Output.incrementalWriteRawLog(currentStep, transactions);
-        kafkaOutput.sendTransactionsToKafka(transactions);
+        if (withoutKafka)
+            kafkaOutput.sendTransactionsToKafka(transactions);
 
         resetVariables();
     }
