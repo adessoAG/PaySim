@@ -26,9 +26,11 @@ The other option is to compile the Java sources by yourself. The project is an m
 ```bash
   mvn clean package
 ```  
-Again you have a jar application which you can execute.
-
-
+This creates a new directory called **installed** with the compiled code and all the necessary parameters files. Inside the directory you can call
+```bash
+  java -jar paysim.jar
+ ```
+to run the data generator. At the first it will create a new folder **outputs** and inside **outputs** a new folder for each run where the output data is stored. 
 
 ## PaySim first paper of the simulator:
 
