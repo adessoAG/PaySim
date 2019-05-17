@@ -25,6 +25,8 @@ public class Parameters {
 
     public static String kafkaTopic;
 
+    public static String kafkaBrokers;
+
     public static void initParameters(String propertiesFile) {
         loadPropertiesFile(propertiesFile);
 
@@ -69,6 +71,7 @@ public class Parameters {
             activityMean = Double.parseDouble(parameters.getProperty("activityMean"));
 
             kafkaTopic = parameters.getProperty("kafkaTopic");
+            kafkaBrokers = parameters.getProperty("kafkaBrokers");
 
             outputPath = parameters.getProperty("outputPath");
         } catch (Exception e) {
@@ -105,6 +108,7 @@ public class Parameters {
         properties.add("maxOccurrencesPerClient=" + maxOccurrencesPerClient);
         properties.add("outputPath=" + outputPath);
         properties.add("kafkaTopic=" + kafkaTopic);
+        properties.add("kafkaBrokers=" + kafkaBrokers);
 
         return String.join(Output.EOL_CHAR, properties);
     }

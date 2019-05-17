@@ -7,6 +7,8 @@ import paysim.base.Transaction;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import paysim.parameters.Parameters;
+
 public class KafkaOutput {
 
     private KafkaProducer<String, String> producer;
@@ -22,7 +24,7 @@ public class KafkaOutput {
 
     private Properties generateKafkaConfig(){
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
+        props.put("bootstrap.servers", Parameters.kafkaBrokers);
         props.put("acks", "all");
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
