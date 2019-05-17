@@ -1,32 +1,29 @@
 package paysim;
 
+import paysim.actors.Bank;
+import paysim.actors.Client;
+import paysim.actors.Fraudster;
+import paysim.actors.Merchant;
+import paysim.base.ClientActionProfile;
+import paysim.base.StandingOrder;
+import paysim.base.Transaction;
+import paysim.output.KafkaOutput;
+import paysim.output.Output;
+import paysim.parameters.ActionTypes;
+import paysim.parameters.BalancesClients;
+import paysim.parameters.Parameters;
+import paysim.utils.CSVReader;
+import sim.engine.SimState;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import paysim.base.StandingOrder;
-import sim.engine.SimState;
-
-import paysim.parameters.*;
-
-import paysim.actors.Bank;
-import paysim.actors.Client;
-import paysim.actors.Fraudster;
-import paysim.actors.Merchant;
-
-import paysim.base.Transaction;
-import paysim.base.ClientActionProfile;
-
-import paysim.output.Output;
-import paysim.output.KafkaOutput;
-
-import paysim.utils.CSVReader;
-
 public class PaySim extends SimState {
     private static final double PAYSIM_VERSION = 0.6;
-    private static final String[] DEFAULT_ARGS = new String[]{"-file", "PaySim.properties", "1", "on"};
+    private static final String[] DEFAULT_ARGS = new String[]{"-file", "PaySim.properties", "1", "off"};
     private static final ArrayList<String> verwenundungszwecke = new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
 
     public final String simulationName;

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" type="text/css" href="integration-test/css/bootstrap.css">
+</head>
+<body>
+  <div class="container">
+    <h1> <center>PaySim Report</center </h1>
+
+    <h3> Simple value tests </h3>
+
+      <table class="table table-hover">
+        <thead>
+          <tr class="table-active">
+            <th></th>
+            <th scope="col"> Simulation </th>
+            <th scope="col"> Parameter </th>
+            <th scope="col"> Test result </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for test in simple_value_tests %}
+            <tr {% if test.test_result %} class="table-success" {% else %} class="table-danger" {% endif %}>
+              <td> {{ test.attribute }} </td>
+              <td> {{ test.in_simulation }} </td>
+              <td> {{ test.expected }} </td>
+              <td> {% if test.test_result %} Succeeded {% else %} Failed {% endif %} </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+
+    <h3> Simple inequality tests </h3>
+      <table class="table table-hover">
+        <thead>
+          <tr class="table-active">
+            <th></th>
+            <th scope="col"> Simulation </th>
+            <th scope="col"> Inequality </th>
+            <th scope="col"> Parameter </th>
+            <th scope="col"> Test result </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for test in simple_inequality_tests %}
+            <tr {% if test.test_result %} class="table-success" {% else %} class="table-danger" {% endif %}>
+              <td> {{ test.attribute }} </td>
+              <td> {{ test.in_simulation }} </td>
+              <td> {{ test.inequality }} </td>
+              <td> {{ test.expected }} </td>
+              <td> {% if test.test_result %} Succeeded {% else %} Failed {% endif %} </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    <h3> Single attribute summaries </h3>
+      <table class="table table-hover">
+        <thead>
+          <tr class="table-active">
+            <th></th>
+            <th scope="col"> Average </th>
+            <th scope="col"> Standard Deviation </th>
+            <th scope="col"> Minimum </th>
+            <th scope="col"> 25% Quantile </th>
+            <th scope="col"> Median </th>
+            <th scope="col"> 75% Quantile </th>
+            <th scope="col"> Maximum </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for summary in attribute_summaries %}
+            <tr class="table-primary">
+              <td> {{ summary.attribute }} </td>
+              <td> {{ "{:.2f}".format(summary.infos["mean"]) }} </td>
+              <td> {{ "{:.2f}".format(summary.infos["std"]) }} </td>
+              <td> {{ "{:.2f}".format(summary.infos["min"]) }} </td>
+              <td> {{ "{:.2f}".format(summary.infos["25%"]) }} </td>
+              <td> {{ "{:.2f}".format(summary.infos["50%"]) }} </td>
+              <td> {{ "{:.2f}".format(summary.infos["75%"]) }} </td>
+              <td> {{ "{:.2f}".format(summary.infos["max"]) }} </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </div>
+</body>
+</html>

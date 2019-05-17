@@ -3,11 +3,10 @@ package paysim.output;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import paysim.base.Transaction;
+import paysim.parameters.Parameters;
 
 import java.util.ArrayList;
 import java.util.Properties;
-
-import paysim.parameters.Parameters;
 
 public class KafkaOutput {
 
