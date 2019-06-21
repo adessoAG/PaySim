@@ -6,7 +6,7 @@
 
     <groupId>org.paysim</groupId>
     <artifactId>paysim</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.6</version>
 
 
     <properties>

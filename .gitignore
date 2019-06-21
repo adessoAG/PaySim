@@ -30,3 +30,6 @@ hs_err_pid*
 
 # Default output folder
 outputs/
+
+# ignore precompiled python files
+__pycache__/
