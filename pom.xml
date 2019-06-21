@@ -96,6 +96,26 @@
                         </configuration>
                     </execution>
                     <execution>
+                    <id>copy-resources-reporting</id>
+                    <!-- here the phase you need -->
+                    <phase>package</phase>
+                    <goals>
+                        <goal>copy-resources</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>installed/reporting</outputDirectory>
+                        <resources>
+                            <resource>
+                                <directory>integration-test</directory>
+                                <excludes>
+                                    <exclude>**/__pycache__/**</exclude>
+                                    <exclude>**/.idea/**</exclude>
+                                </excludes>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </execution>
+                    <execution>
                         <id>copy-resources-jar</id>
                         <!-- here the phase you need -->
                         <phase>package</phase>
